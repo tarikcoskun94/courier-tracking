@@ -1,0 +1,21 @@
+package com.migrosone.couriertracking.response.store;
+
+import com.migrosone.couriertracking.dto.store.StoreDTO;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.List;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public class AllStoresResponse {
+
+    private List<StoreDTO> allStores;
+
+    public static AllStoresResponse of(List<StoreDTO> allStores) {
+        return new AllStoresResponse(allStores);
+    }
+}
