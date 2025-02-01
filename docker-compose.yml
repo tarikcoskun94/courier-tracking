@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgis/postgis:latest
+    container_name: postgis_container
+    environment:
+      POSTGRES_USER: mgUser
+      POSTGRES_PASSWORD: mgPassword
+      POSTGRES_DB: mg-case-db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  app:
+    build:
+      context: .
+    container_name: mg-courier-tracking
+    depends_on:
+      - db
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/mg-case-db
+      SPRING_DATASOURCE_USERNAME: mgUser
+      SPRING_DATASOURCE_PASSWORD: mgPassword
+      SPRING_JPA_HIBERNATE_DDL_AUTO: create
+
+volumes:
+  pgdata:
+    driver: local
+
