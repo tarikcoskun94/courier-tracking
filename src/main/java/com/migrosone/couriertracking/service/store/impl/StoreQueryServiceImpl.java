@@ -5,11 +5,13 @@ import com.migrosone.couriertracking.mapper.store.StoreMapper;
 import com.migrosone.couriertracking.service.store.StoreQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class StoreQueryServiceImpl implements StoreQueryService {
 
     private final StoreCoreServiceImpl coreService;
@@ -17,7 +19,7 @@ public class StoreQueryServiceImpl implements StoreQueryService {
 
     @Override
     public List<StoreDTO> getAllStores() {
-        return coreService.getAllStores().stream()
+        return coreService.findAll().stream()
                 .map(mapper::toDto)
                 .toList();
     }

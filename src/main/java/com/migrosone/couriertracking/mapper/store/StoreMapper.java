@@ -2,7 +2,6 @@ package com.migrosone.couriertracking.mapper.store;
 
 import com.migrosone.couriertracking.dto.store.StoreDTO;
 import com.migrosone.couriertracking.entity.store.Store;
-import com.migrosone.couriertracking.mapper.EmbeddedAuditMapper;
 import com.migrosone.couriertracking.mapper.location.PointMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -12,7 +11,6 @@ import org.springframework.stereotype.Component;
 public class StoreMapper {
 
     private final PointMapper pointMapper;
-    private final EmbeddedAuditMapper embeddedAuditMapper;
 
     public Store toEntity(StoreDTO dto) {
         if (dto == null) {
@@ -23,21 +21,29 @@ public class StoreMapper {
         store.setId(dto.getId());
         store.setName(dto.getName());
         store.setLocation(pointMapper.toPoint(dto.getLocation()));
-        store.setAudit(embeddedAuditMapper.toAudit(dto.getAudit()));
 
         return store;
     }
 
-    public StoreDTO toDto(Store store) {
-        if (store == null) {
+    public StoreDTO toDto(Store entity) {
+        if (entity == null) {
             return null;
         }
 
         StoreDTO dto = new StoreDTO();
-        dto.setId(store.getId());
-        dto.setName(store.getName());
-        dto.setLocation(pointMapper.toDto(store.getLocation()));
-        dto.setAudit(embeddedAuditMapper.toDto(store.getAudit()));
+        dto.setId(entity.getId());
+        dto.setName(entity.getName());
+        dto.setLocation(pointMapper.toDto(entity.getLocation()));
+
+        if (entity.getCreationAudit() != null) {
+            dto.setCreatorUser(entity.getCreationAudit().getCreatorUser());
+            dto.setCreationDate(entity.getCreationAudit().getCreationDate());
+        }
+
+        if (entity.getUpdateAudit() != null) {
+            dto.setUpdaterUser(entity.getUpdateAudit().getUpdaterUser());
+            dto.setUpdateDate(entity.getUpdateAudit().getUpdateDate());
+        }
 
         return dto;
     }

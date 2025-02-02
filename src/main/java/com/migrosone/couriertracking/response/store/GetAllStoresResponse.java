@@ -11,11 +11,11 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class AllStoresResponse {
+public class GetAllStoresResponse {
 
     private List<StoreDTO> allStores;
 
-    public static AllStoresResponse of(List<StoreDTO> allStores) {
-        return new AllStoresResponse(allStores);
+    public static GetAllStoresResponse of(List<StoreDTO> allStores) {
+        return new GetAllStoresResponse(allStores);
     }
 }

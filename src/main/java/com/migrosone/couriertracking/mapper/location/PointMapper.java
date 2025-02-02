@@ -10,14 +10,14 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class PointMapper {
 
-    public Point toPoint(PointDTO pointDTO) {
-        if (pointDTO == null) {
+    public Point toPoint(PointDTO dto) {
+        if (dto == null) {
             return null;
         }
 
         GeometryFactory geometryFactory = new GeometryFactory();
         return geometryFactory.createPoint(new org.locationtech.jts.geom.Coordinate(
-                pointDTO.getLongitude(), pointDTO.getLatitude()));
+                dto.getLongitude(), dto.getLatitude()));
     }
 
     public PointDTO toDto(Point point) {

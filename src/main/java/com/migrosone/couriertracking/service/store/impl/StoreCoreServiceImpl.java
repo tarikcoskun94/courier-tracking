@@ -5,6 +5,7 @@ import com.migrosone.couriertracking.repository.store.StoreRepository;
 import com.migrosone.couriertracking.service.store.StoreCoreService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -15,7 +16,8 @@ public class StoreCoreServiceImpl implements StoreCoreService {
     private final StoreRepository repository;
 
     @Override
-    public List<Store> getAllStores() {
+    @Transactional(readOnly = true)
+    public List<Store> findAll() {
         return repository.findAll();
     }
 }

@@ -1,6 +1,6 @@
 package com.migrosone.couriertracking.controller.store;
 
-import com.migrosone.couriertracking.response.store.AllStoresResponse;
+import com.migrosone.couriertracking.response.store.GetAllStoresResponse;
 import com.migrosone.couriertracking.service.store.StoreQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,9 +16,9 @@ public class StoreQueryController {
     private final StoreQueryService service;
 
     @GetMapping()
-    public ResponseEntity<AllStoresResponse> getAllStores() {
+    public ResponseEntity<GetAllStoresResponse> getAllStores() {
         return ResponseEntity.ok(
-                AllStoresResponse.of(service.getAllStores())
+                GetAllStoresResponse.of(service.getAllStores())
         );
     }
 }
