@@ -27,9 +27,6 @@ public class Courier implements Serializable {
     @Column(name = "LAST_NAME", nullable = false, length = 100)
     private String lastName;
 
-    @Column(name = "REFERENCE_GEO_SIGNAL_ID")
-    private Long referenceGeoSignalId;
-
     @Column(name = "TOTAL_DISTANCE", precision = 10, scale = 2, nullable = false)
     private BigDecimal totalDistance = BigDecimal.ZERO;
 
@@ -38,10 +35,10 @@ public class Courier implements Serializable {
     private Long version = 1L;
 
     @Embedded
-    private EmbeddedCreationAudit creationAudit;
+    private EmbeddedCreationAudit creationAudit = new EmbeddedCreationAudit();
 
     @Embedded
-    private EmbeddedUpdateAudit updateAudit;
+    private EmbeddedUpdateAudit updateAudit = new EmbeddedUpdateAudit();
 
     public void addTotalDistance(BigDecimal distance) {
         this.totalDistance = this.totalDistance.add(distance);

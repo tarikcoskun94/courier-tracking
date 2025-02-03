@@ -18,7 +18,6 @@ public class CourierMapper {
         courier.setId(dto.getId());
         courier.setFirstName(dto.getFirstName());
         courier.setLastName(dto.getLastName());
-        courier.setReferenceGeoSignalId(dto.getReferenceLocationId());
         courier.setTotalDistance(dto.getTotalDistance());
 
         return courier;
@@ -33,7 +32,6 @@ public class CourierMapper {
         courierDTO.setId(entity.getId());
         courierDTO.setFirstName(entity.getFirstName());
         courierDTO.setLastName(entity.getLastName());
-        courierDTO.setReferenceLocationId(entity.getReferenceGeoSignalId());
         courierDTO.setTotalDistance(entity.getTotalDistance());
 
         if (entity.getCreationAudit() != null) {

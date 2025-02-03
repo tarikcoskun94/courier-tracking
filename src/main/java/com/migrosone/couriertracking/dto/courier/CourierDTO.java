@@ -11,7 +11,6 @@ public class CourierDTO {
     private Long id;
     private String firstName;
     private String lastName;
-    private Long referenceLocationId;
     private BigDecimal totalDistance;
     private String creatorUser;
     private LocalDateTime creationDate;

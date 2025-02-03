@@ -5,8 +5,11 @@ import com.migrosone.couriertracking.service.courier.CourierQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.math.BigDecimal;
 
 @RestController
 @RequestMapping("/couriers")
@@ -20,5 +23,10 @@ public class CourierQueryController {
         return ResponseEntity.ok(
                 GetAllCouriersResponse.of(service.getAllCouriers())
         );
+    }
+
+    @GetMapping("/{id}/total-distance")
+    public ResponseEntity<BigDecimal> getAllCouriers(@PathVariable Long id) {
+        return ResponseEntity.ok(service.getTotalDistanceById(id));
     }
 }

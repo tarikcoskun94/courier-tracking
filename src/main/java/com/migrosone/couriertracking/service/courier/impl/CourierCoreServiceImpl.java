@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,8 +25,20 @@ public class CourierCoreServiceImpl implements CourierCoreService {
 
     @Override
     @Transactional(readOnly = true)
+    public List<Courier> findAllById(Iterable<Long> ids) {
+        return repository.findAllById(ids);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public Optional<Courier> findById(Long id) {
         return repository.findById(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public BigDecimal findTotalDistanceById(Long id) {
+        return repository.findTotalDistanceById(id);
     }
 
     @Override
@@ -36,7 +49,7 @@ public class CourierCoreServiceImpl implements CourierCoreService {
 
     @Override
     @Transactional
-    public List<Courier> saveAll(List<Courier> couriers) {
+    public List<Courier> saveAll(Iterable<Courier> couriers) {
         return repository.saveAll(couriers);
     }
 }

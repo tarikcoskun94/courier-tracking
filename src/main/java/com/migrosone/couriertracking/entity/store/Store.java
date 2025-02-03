@@ -35,5 +35,5 @@ public class Store implements Serializable {
     private EmbeddedCreationAudit creationAudit;
 
     @Embedded
-    private EmbeddedUpdateAudit updateAudit;
+    private EmbeddedUpdateAudit updateAudit = new EmbeddedUpdateAudit();
 }
