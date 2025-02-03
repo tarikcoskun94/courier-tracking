@@ -30,6 +30,6 @@ public class CourierDriveCoreServiceImpl implements CourierDriveCoreService {
     @Override
     @Transactional
     public CourierDrive save(CourierDrive courierDrive) {
-        return repository.saveAndFlush(courierDrive);
+        return repository.save(courierDrive);
     }
 }
