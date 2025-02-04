@@ -3,6 +3,7 @@ package com.migrosone.couriertracking.service.courier.impl;
 import com.migrosone.couriertracking.entity.courier.CourierDrive;
 import com.migrosone.couriertracking.entity.courier.CourierGeoSignal;
 import com.migrosone.couriertracking.event.courier.CourierDriveFinishEvent;
+import com.migrosone.couriertracking.event.courier.CourierGeoSignalReceivedEvent;
 import com.migrosone.couriertracking.messagequeue.MessageQueue;
 import com.migrosone.couriertracking.messagequeue.MessageQueueTopic;
 import com.migrosone.couriertracking.request.courier.SaveCourierGeoSignalRequest;
@@ -31,13 +32,13 @@ public class CourierGeoServiceImpl implements CourierGeoService {
     private final CourierGeoSignalCoreService courierGeoSignalCoreService;
 
     @Override
-    @Transactional
     public void receiveCourierGeoSignal(SaveCourierGeoSignalRequest request) {
         if (!courierDriveCoreService.existActiveDriveByCourierId(request.getCourierId())) {
             throw new IllegalStateException("No active drive found for the courier");
         }
 
         messageQueue.publish(MessageQueueTopic.COURIER_GEO_SIGNAL_TOPIC, request.getCourierGeoSignal());
+        eventPublisher.publishEvent(CourierGeoSignalReceivedEvent.of(this, request.getCourierGeoSignal()));
     }
 
     @Override

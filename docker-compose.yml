@@ -13,12 +13,22 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
 
+  redis:
+    image: redis:latest
+    container_name: redis_container
+    ports:
+      - "6379:6379"
+    command: ["redis-server", "--appendonly", "yes"]  # Verilerin kalıcı olması için AOF modunu açıyoruz
+    volumes:
+      - redisdata:/data
+
   app:
     build:
       context: .
     container_name: mg-courier-tracking
     depends_on:
       - db
+      - redis
     ports:
       - "8080:8080"
     environment:
@@ -26,8 +36,11 @@ services:
       SPRING_DATASOURCE_USERNAME: mgUser
       SPRING_DATASOURCE_PASSWORD: mgPassword
       SPRING_JPA_HIBERNATE_DDL_AUTO: create
+      SPRING_REDIS_HOST: redis
+      SPRING_REDIS_PORT: 6379
 
 volumes:
   pgdata:
     driver: local
-
+  redisdata:
+    driver: local
