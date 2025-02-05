@@ -35,7 +35,8 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/mg-case-db
       SPRING_DATASOURCE_USERNAME: mgUser
       SPRING_DATASOURCE_PASSWORD: mgPassword
-      SPRING_JPA_HIBERNATE_DDL_AUTO: create
+      SPRING_JPA_HIBERNATE_DDL_AUTO: none
+      SPRING_SQL_INIT_MODE: always
       SPRING_REDIS_HOST: redis
       SPRING_REDIS_PORT: 6379
 
