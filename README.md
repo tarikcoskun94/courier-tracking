@@ -84,6 +84,6 @@ This project process gps signals of the couriers.
 * Calculate travel distance of "1 driving" and add on total distance.
 * Enterance in range of stores (100m) was managed on simple Redis cache. !!! Only 1 enterance in 1 minute !!!
 * Enterances log to file.
-* Go to any path you want, and run comman: 'docker cp 58a3eadb2bca:/app/logs/courierInRangeOfStore.log ./courierInRangeOfStore.log'
+* Go to any path you want, and run comman: 'docker cp [containerId]:/app/logs/courierInRangeOfStore.log ./courierInRangeOfStore.log'
 * File was coppied to local machine.
 * Geographical calculations are performing on PostgreSQL.
