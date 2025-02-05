@@ -32,6 +32,7 @@ services:
     ports:
       - "8080:8080"
     environment:
+      SPRING_PROFILES_ACTIVE: docker
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/mg-case-db
       SPRING_DATASOURCE_USERNAME: mgUser
       SPRING_DATASOURCE_PASSWORD: mgPassword
