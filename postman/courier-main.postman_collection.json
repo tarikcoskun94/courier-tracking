@@ -1,0 +1,42 @@
+{
+	"info": {
+		"_postman_id": "5a784387-ee40-4e2b-8bcf-58d03a1c7da9",
+		"name": "courier-main",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "35037465"
+	},
+	"item": [
+		{
+			"name": "all-couriers",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{courier-base-url}}",
+					"host": [
+						"{{courier-base-url}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "total-distance-by-id",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{courier-base-url}}/4/total-distance",
+					"host": [
+						"{{courier-base-url}}"
+					],
+					"path": [
+						"4",
+						"total-distance"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

@@ -1,0 +1,24 @@
+{
+	"info": {
+		"_postman_id": "16022c83-15e4-45ff-a993-5a36a72819f6",
+		"name": "store",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "35037465"
+	},
+	"item": [
+		{
+			"name": "all-stores",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{store-base-url}}",
+					"host": [
+						"{{store-base-url}}"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

@@ -1,0 +1,320 @@
+{
+	"info": {
+		"_postman_id": "7434c49e-43c9-412c-856c-f4afac4b56c4",
+		"name": "courier-geo",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "35037465"
+	},
+	"item": [
+		{
+			"name": "start-drive",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"console.info(\"🚀 courier-geo::start-drive -> İSTEK ATILDI: \", JSON.parse(pm.request.body));"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Yanıt başarılı mı kontrol et\r",
+							"if (pm.response.code >= 200 && pm.response.code < 300) {\r",
+							"    let courierId = pm.request.body ? JSON.parse(pm.request.body).courierId : null;\r",
+							"    let location = pm.request.body ? JSON.parse(pm.request.body).location : null;\r",
+							"\r",
+							"    if (courierId && location) {\r",
+							"        // Global değişkenler\r",
+							"        let courierInDriveIds = pm.globals.get(\"courierInDriveIds\");\r",
+							"        let courierLastLocations = pm.globals.get(\"courierLastLocations\");\r",
+							"\r",
+							"        // courierInDriveIds dizisini al veya boş bir dizi oluştur\r",
+							"        courierInDriveIds = courierInDriveIds ? JSON.parse(courierInDriveIds) : [];\r",
+							"\r",
+							"        // Eğer courierId daha önce eklenmemişse listeye ekle\r",
+							"        if (!courierInDriveIds.includes(courierId)) {\r",
+							"            courierInDriveIds.push(courierId);\r",
+							"            pm.globals.set(\"courierInDriveIds\", JSON.stringify(courierInDriveIds));\r",
+							"        }\r",
+							"\r",
+							"        // courierLastLocations objesini al veya boş bir obje oluştur\r",
+							"        courierLastLocations = courierLastLocations ? JSON.parse(courierLastLocations) : {};\r",
+							"\r",
+							"        // Son konumu güncelle\r",
+							"        courierLastLocations[courierId] = {\r",
+							"            latitude: location.latitude,\r",
+							"            longitude: location.longitude\r",
+							"        };\r",
+							"\r",
+							"        pm.globals.set(\"courierLastLocations\", JSON.stringify(courierLastLocations));\r",
+							"\r",
+							"        console.info(\"🔄 courier-geo::start-drive -> GLOBAL DEĞİŞKENLERE KURYE EKLENDİ: courierInDriveIds ve courierLastLocations\");\r",
+							"    }\r",
+							"}\r",
+							"\r",
+							"console.log(\"\");\r",
+							"console.log(\"\");"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"courierId\": 5,\r\n  \"location\": {\r\n    \"latitude\": 40.98992133009554,\r\n    \"longitude\": 29.12197657770705\r\n  },\r\n  \"time\": \"1900-01-01T00:00:00.000000Z\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{courier-base-url}}/start-drive",
+					"host": [
+						"{{courier-base-url}}"
+					],
+					"path": [
+						"start-drive"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "geo-signal",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Helper: İki nokta arasındaki mesafeyi hesapla (Haversine formülü)\r",
+							"function haversineDistance(lat1, lon1, lat2, lon2) {\r",
+							"    const R = 6371e3; // Dünya yarıçapı (metre)\r",
+							"    const toRad = (deg) => deg * (Math.PI / 180);\r",
+							"    \r",
+							"    const dLat = toRad(lat2 - lat1);\r",
+							"    const dLon = toRad(lon2 - lon1);\r",
+							"    \r",
+							"    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +\r",
+							"              Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * \r",
+							"              Math.sin(dLon / 2) * Math.sin(dLon / 2);\r",
+							"              \r",
+							"    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));\r",
+							"    \r",
+							"    return R * c; // Mesafe (metre)\r",
+							"}\r",
+							"\r",
+							"// Helper: Rastgele küçük bir hareket oluştur (yaklaşık 10-50 metre arası)\r",
+							"function randomMovement(lat, lon) {\r",
+							"    const delta = (Math.random() - 0.5) * 0.0005; // Küçük kayma (~10-50m)\r",
+							"    return { \r",
+							"        latitude: lat + delta, \r",
+							"        longitude: lon + delta \r",
+							"    };\r",
+							"}\r",
+							"\r",
+							"// Helper: Mağazaya yaklaştır\r",
+							"function moveCloserToStore(courierLocation, storeLocation) {\r",
+							"    const factor = 0.2 + Math.random() * 0.4; // 0.2 ile 0.6 arasında bir yaklaşma oranı\r",
+							"    return {\r",
+							"        latitude: courierLocation.latitude + factor * (storeLocation.lat - courierLocation.latitude),\r",
+							"        longitude: courierLocation.longitude + factor * (storeLocation.lng - courierLocation.longitude)\r",
+							"    };\r",
+							"}\r",
+							"\r",
+							"// Global değişkenleri al\r",
+							"let courierIds = pm.globals.get(\"courierInDriveIds\");\r",
+							"let courierLastLocations = pm.globals.get(\"courierLastLocations\");\r",
+							"let storeLocations = pm.globals.get(\"storeLocations\");\r",
+							"\r",
+							"courierIds = courierIds ? JSON.parse(courierIds) : [];\r",
+							"courierLastLocations = courierLastLocations ? JSON.parse(courierLastLocations) : {};\r",
+							"storeLocations = storeLocations ? JSON.parse(storeLocations) : [];\r",
+							"\r",
+							"// Eğer aktif kurye yoksa hata verme\r",
+							"if (courierIds.length === 0) {\r",
+							"    console.log(\"🚨 Aktif sürüşte kurye bulunamadı!\");\r",
+							"    return;\r",
+							"}\r",
+							"\r",
+							"// Rastgele bir kurye seç\r",
+							"let randomCourierId = courierIds[Math.floor(Math.random() * courierIds.length)];\r",
+							"\r",
+							"// Kuryenin son konumunu al veya rastgele bir yerden başlat\r",
+							"let lastLocation = courierLastLocations[randomCourierId] || {\r",
+							"    latitude: 40.990, // Varsayılan başlangıç noktası\r",
+							"    longitude: 29.120\r",
+							"};\r",
+							"\r",
+							"// Kuryeye hareket ettir\r",
+							"let newLocation;\r",
+							"let moveType = Math.random();\r",
+							"\r",
+							"if (storeLocations.length > 0 && moveType < 0.6) {\r",
+							"    // %60 ihtimalle en yakın mağazaya yaklaştır\r",
+							"    let closestStore = storeLocations.reduce((closest, store) => {\r",
+							"        let distance = haversineDistance(lastLocation.latitude, lastLocation.longitude, store.lat, store.lng);\r",
+							"        return distance < closest.distance ? { store, distance } : closest;\r",
+							"    }, { store: null, distance: Infinity });\r",
+							"\r",
+							"    if (closestStore.distance < 200) { // 200m içindeyse\r",
+							"        console.log(`📍 Kurye ${randomCourierId}, ${closestStore.store.name} mağazasına yakın!`);\r",
+							"        newLocation = moveCloserToStore(lastLocation, closestStore.store);\r",
+							"    } else {\r",
+							"        console.log(`🚶‍♂️ Kurye ${randomCourierId}, mağazalara yaklaşıyor.`);\r",
+							"        newLocation = randomMovement(lastLocation.latitude, lastLocation.longitude);\r",
+							"    }\r",
+							"} else {\r",
+							"    // %40 ihtimalle rastgele ilerlet\r",
+							"    console.log(`🚀 Kurye ${randomCourierId}, normal rotasında hareket ediyor.`);\r",
+							"    newLocation = randomMovement(lastLocation.latitude, lastLocation.longitude);\r",
+							"}\r",
+							"\r",
+							"// Kuryenin son konumunu güncelle\r",
+							"courierLastLocations[randomCourierId] = newLocation;\r",
+							"pm.globals.set(\"courierLastLocations\", JSON.stringify(courierLastLocations));\r",
+							"\r",
+							"// Sistem saatini al\r",
+							"let now = new Date();\r",
+							"now.setHours(now.getHours() + 3);\r",
+							"\r",
+							"// Postman isteği için body oluştur\r",
+							"let requestBody = {\r",
+							"    courierId: randomCourierId,\r",
+							"    time: now.toISOString(),\r",
+							"    location: newLocation\r",
+							"};\r",
+							"\r",
+							"// Body'yi ayarla\r",
+							"pm.request.body.raw = JSON.stringify(requestBody, null, 2);\r",
+							"console.log(\"✅ Yeni konum oluşturuldu:\", requestBody);\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{courier-base-url}}/geo-signal",
+					"host": [
+						"{{courier-base-url}}"
+					],
+					"path": [
+						"geo-signal"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "finish-drive",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"console.info(\"🚀 courier-geo::finish-drive -> İSTEK ATILDI: \", JSON.parse(pm.request.body));"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Yanıt başarılı mı kontrol et\r",
+							"if (pm.response.code >= 200 && pm.response.code < 300) {\r",
+							"    let courierId = pm.request.body ? JSON.parse(pm.request.body).courierId : null;\r",
+							"\r",
+							"    if (courierId) {\r",
+							"        // Global değişkenler\r",
+							"        let courierInDriveIds = pm.globals.get(\"courierInDriveIds\");\r",
+							"        let courierLastLocations = pm.globals.get(\"courierLastLocations\");\r",
+							"\r",
+							"        // courierInDriveIds dizisini al veya boş bir dizi oluştur\r",
+							"        courierInDriveIds = courierInDriveIds ? JSON.parse(courierInDriveIds) : [];\r",
+							"\r",
+							"        // courierId varsa listeden çıkar\r",
+							"        let updatedCourierIds = courierInDriveIds.filter(id => id !== courierId);\r",
+							"        pm.globals.set(\"courierInDriveIds\", JSON.stringify(updatedCourierIds));\r",
+							"\r",
+							"        // courierLastLocations objesini al veya boş bir obje oluştur\r",
+							"        courierLastLocations = courierLastLocations ? JSON.parse(courierLastLocations) : {};\r",
+							"\r",
+							"        // Kurye lokasyonunu listeden kaldır\r",
+							"        if (courierLastLocations.hasOwnProperty(courierId)) {\r",
+							"            delete courierLastLocations[courierId];\r",
+							"            pm.globals.set(\"courierLastLocations\", JSON.stringify(courierLastLocations));\r",
+							"        }\r",
+							"\r",
+							"        console.info(\"🔄 courier-geo::finish-drive -> GLOBAL DEĞİŞKENLERDEN KURYE ÇIKARILDI: courierInDriveIds ve courierLastLocations\");\r",
+							"    }\r",
+							"}\r",
+							"\r",
+							"console.log(\"\");\r",
+							"console.log(\"\");"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"courierId\": 1,\r\n  \"location\": {\r\n    \"latitude\": 40.98992133009554,\r\n    \"longitude\": 29.12197657770705\r\n  },\r\n  \"time\": \"2100-12-31T23:59:59.000000Z\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{courier-base-url}}/finish-drive",
+					"host": [
+						"{{courier-base-url}}"
+					],
+					"path": [
+						"finish-drive"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
