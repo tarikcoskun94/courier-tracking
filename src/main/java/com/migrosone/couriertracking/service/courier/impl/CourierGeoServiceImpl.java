@@ -32,16 +32,6 @@ public class CourierGeoServiceImpl implements CourierGeoService {
     private final CourierGeoSignalCoreService courierGeoSignalCoreService;
 
     @Override
-    public void receiveCourierGeoSignal(SaveCourierGeoSignalRequest request) {
-        if (!courierDriveCoreService.existActiveDriveByCourierId(request.getCourierId())) {
-            throw new IllegalStateException("No active drive found for the courier");
-        }
-
-        messageQueue.publish(MessageQueueTopic.COURIER_GEO_SIGNAL_TOPIC, request.getCourierGeoSignal());
-        eventPublisher.publishEvent(CourierGeoSignalReceivedEvent.of(this, request.getCourierGeoSignal()));
-    }
-
-    @Override
     @Transactional
     public void startDrive(SaveCourierGeoSignalRequest request) {
         Optional<CourierDrive> activeDriveOpt = courierDriveCoreService.findActiveDriveByCourierId(request.getCourierId());
@@ -53,6 +43,16 @@ public class CourierGeoServiceImpl implements CourierGeoService {
         CourierGeoSignal starterSignal = courierGeoSignalCoreService.save(request.getCourierGeoSignal());
         CourierDrive startingDrive = CourierDrive.start(request.getCourierId(), starterSignal.getId());
         courierDriveCoreService.save(startingDrive);
+    }
+
+    @Override
+    public void receiveCourierGeoSignal(SaveCourierGeoSignalRequest request) {
+        if (!courierDriveCoreService.existActiveDriveByCourierId(request.getCourierId())) {
+            throw new IllegalStateException("No active drive found for the courier");
+        }
+
+        messageQueue.publish(MessageQueueTopic.COURIER_GEO_SIGNAL_TOPIC, request.getCourierGeoSignal());
+        eventPublisher.publishEvent(CourierGeoSignalReceivedEvent.of(this, request.getCourierGeoSignal()));
     }
 
     @Override

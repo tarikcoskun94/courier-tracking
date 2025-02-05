@@ -26,7 +26,7 @@ public class CourierQueryController {
     }
 
     @GetMapping("/{id}/total-distance")
-    public ResponseEntity<BigDecimal> getAllCouriers(@PathVariable Long id) {
+    public ResponseEntity<BigDecimal> getTotalDistanceById(@PathVariable Long id) {
         return ResponseEntity.ok(service.getTotalDistanceById(id));
     }
 }

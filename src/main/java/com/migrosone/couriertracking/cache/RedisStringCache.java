@@ -13,11 +13,6 @@ public class RedisStringCache implements Cache<String, String> {
     private final StringRedisTemplate redisTemplate;
 
     @Override
-    public void put(String key, String value) {
-        redisTemplate.opsForValue().set(key, value);
-    }
-
-    @Override
     public void put(String key, String value, Duration duration) {
         redisTemplate.opsForValue().set(key, value, duration);
     }
@@ -25,10 +20,5 @@ public class RedisStringCache implements Cache<String, String> {
     @Override
     public String get(String key) {
         return redisTemplate.opsForValue().get(key);
-    }
-
-    @Override
-    public boolean delete(String key) {
-        return key != null && redisTemplate.delete(key);
     }
 }
